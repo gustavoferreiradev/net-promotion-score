@@ -1,6 +1,7 @@
 import { Response, Request, response } from "express";
 import { resolve } from "path";
 import { getCustomRepository } from "typeorm";
+import { AppError } from "../errors/AppError";
 import { SurveysRepository } from "../repositories/SurveysRepository";
 import { SurveysUsersRepository } from "../repositories/SurveysUsersRepository";
 import { UsersRepository } from "../repositories/UsersRepository";
@@ -17,9 +18,7 @@ class SendMailController {
     const user = await usersRepository.findOne({ email });
 
     if (!user) {
-      return response.status(400).json({
-        error: "User does not exists",
-      });
+      throw new AppError("User does not exists");
     }
 
     const survey = await surveysRepository.findOne({
@@ -27,11 +26,8 @@ class SendMailController {
     });
 
     if (!survey) {
-      return response.status(400).json({
-        error: "Survey does not exists",
-      });
+      throw new AppError("Survey does not exists");
     }
-
 
     const npsPath = resolve(__dirname, "..", "views", "emails", "npsMail.hbs");
 
